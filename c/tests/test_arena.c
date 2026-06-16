@@ -92,6 +92,17 @@ static void test_arena_alloc_aligned_over_capacity(void) {
     arena_free(&arena);
 }
 
+static void test_arena_alloc_aligned_zero_alignment(void) {
+    Arena arena;
+    assert(arena_init(&arena, 128));
+
+    void *ptr = arena_alloc_aligned(&arena, 4, 0);
+    assert(ptr == NULL);
+    assert(arena.offset == 0);
+
+    arena_free(&arena);
+}
+
 int main(void) {
     test_init();
     test_basic_alloc();
@@ -100,6 +111,7 @@ int main(void) {
     test_arena_reset();
     test_arena_alloc_aligned();
     test_arena_alloc_aligned_over_capacity();
+    test_arena_alloc_aligned_zero_alignment();
 
     printf("All arena tests passed!\n");
     return 0;

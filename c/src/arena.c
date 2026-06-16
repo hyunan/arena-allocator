@@ -26,10 +26,11 @@ void *arena_alloc(Arena *arena, size_t size) {
 }
 
 void *arena_alloc_aligned(Arena *arena, size_t size, size_t alignment) {
-    if (!arena)
+    if (!arena || alignment == 0)
         return NULL;
-    
-    size_t padding = alignment - arena->offset % alignment;
+
+    size_t mod = arena->offset % alignment;
+    size_t padding = mod ? alignment - mod : 0;
     if (arena->offset + padding + size > arena->capacity)
         return NULL;
     
