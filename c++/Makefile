@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -Wextra -std=c++14 -Iinclude
+CFLAGS = -Wall -Wextra -std=c++17 -Iinclude
 
 SRC = src/arena.cpp
 EXAMPLE = examples/main.cpp
@@ -20,5 +20,4 @@ test: $(T_OUT)
 	./$(T_OUT)
 
 clean:
-	rm -f $(OUT)
-	rm -f $(T_OUT)
+	rm -f $(OUT) $(T_OUT)

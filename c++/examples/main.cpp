@@ -1,58 +1,77 @@
-#include <stdio.h>
+#include <iostream>
 
 #include "arena.h"
 
-
-typedef struct Node {
+struct Node {
     int data;
-    struct Node *next;
-} Node;
+    Node* next;
+};
 
+int main() {
+    std::cout << "Simple linked list program to demo arena usage.\n";
 
-int main(void) {
-    printf("Simple linked list program to demo arena usage.\n");
+    Arena arena(sizeof(Node) * 20);
 
-    Arena arena;
-    arena_init(&arena, sizeof(Node) * 20);
-
-    Node *head = arena_alloc(&arena, sizeof(Node));
+    Node* head = static_cast<Node*>(arena.alloc(sizeof(Node)));
     head->data = 0;
-    head->next = NULL;
-    Node *temp = head;
+    head->next = nullptr;
 
-    for (int i = 1; i <= 10; i++) {
-        Node *node = arena_alloc(&arena, sizeof(Node));
+    Node* temp = head;
+
+    for (int i = 1; i <= 10; ++i) {
+        Node* node = static_cast<Node*>(arena.alloc(sizeof(Node)));
+
         node->data = i;
-        node->next = NULL;
+        node->next = nullptr;
+
         temp->next = node;
-        temp = temp->next;
+        temp = node;
     }
 
-    // Loop through and print the linked list
-    for (Node *p = head; p != NULL; p = p->next)
-        printf("Node %d\n", p->data);
+    std::cout << "\nForward traversal:\n";
 
-    // Reset the arena to rewrite
-    printf("Before reset:\n\tArena used: %.2f%%\n\n", (float) arena_used(&arena) / arena.capacity * 100);
-    arena_reset(&arena);
-    printf("After reset:\n\tArena used: %.2f%%\n\n", (float) arena_used(&arena) / arena.capacity * 100);
+    for (Node* p = head; p != nullptr; p = p->next) {
+        std::cout << "Node " << p->data << '\n';
+    }
 
-    printf("Resetting and overwritting.\n");
-    head = arena_alloc(&arena, sizeof(Node));
+    std::cout << "\nBefore reset:\n";
+    std::cout << "Used: " << arena.used() << '\n';
+    std::cout << "Remaining: " << arena.remaining() << '\n';
+
+    arena.reset();
+
+    std::cout << "\nAfter reset:\n";
+    std::cout << "Used: " << arena.used() << '\n';
+    std::cout << "Remaining: " << arena.remaining() << '\n';
+
+    std::cout << "\nReusing arena:\n";
+
+    head = static_cast<Node*>(arena.alloc(sizeof(Node)));
     head->data = 10;
-    head->next = NULL;
+    head->next = nullptr;
+
     temp = head;
 
-    for (int i = 9; i >= 0; i--) {
-        Node *node = arena_alloc(&arena, sizeof(Node));
+    for (int i = 9; i >= 0; --i) {
+        Node* node = static_cast<Node*>(arena.alloc(sizeof(Node)));
+
         node->data = i;
-        node->next = NULL;
+        node->next = nullptr;
+
         temp->next = node;
-        temp = temp->next;
-        // Print arena stats
-        printf("Arena usage:\nUsed: %zu, Remaining: %zu\n", arena_used(&arena), arena_remaining(&arena));
+        temp = node;
+
+        std::cout
+            << "Used: " << arena.used()
+            << " Remaining: " << arena.remaining()
+            << '\n';
     }
-    
-    arena_free(&arena);
+
+    std::cout << "\nFinal traversal:\n";
+
+    for (Node* p = head; p != nullptr; p = p->next) {
+        std::cout << "Node " << p->data << '\n';
+    }
+
     return 0;
 }
